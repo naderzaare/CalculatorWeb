@@ -2,12 +2,15 @@
 var builder = WebApplication.CreateBuilder(args);
 var app = builder.Build();
 
+// Main web page
 app.MapGet("/", () => Results.Content("""
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>My Docker Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker Calculator v2</title>
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -16,6 +19,7 @@ app.MapGet("/", () => Results.Content("""
             justify-content: center;
             padding-top: 80px;
         }
+
         .card {
             background: white;
             padding: 35px;
@@ -24,50 +28,124 @@ app.MapGet("/", () => Results.Content("""
             text-align: center;
             width: 350px;
         }
-        input, button {
+
+        input {
             padding: 12px;
             margin: 8px;
             width: 80%;
             box-sizing: border-box;
         }
+
         button {
-            background: #2563eb;
+            padding: 12px;
+            margin: 8px;
+            width: 80%;
+            box-sizing: border-box;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+        }
+
+        .calculate-btn {
+            background: #2563eb;
+        }
+
+        .clear-btn {
+            background: #64748b;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .version {
+            color: #64748b;
+            font-size: 12px;
+            margin-top: 20px;
         }
     </style>
 </head>
+
 <body>
     <div class="card">
         <h2>Docker Calculator</h2>
-        <input type="number" id="num1" placeholder="First number">
-        <input type="number" id="num2" placeholder="Second number">
-        <button onclick="calculate()">Calculate</button>
+
+        <input type="number" id="num1"
+               placeholder="First number">
+
+        <input type="number" id="num2"
+               placeholder="Second number">
+
+        <button class="calculate-btn"
+                onclick="calculate()">
+            Calculate
+        </button>
+
+        <button class="clear-btn"
+                onclick="clearCalculator()">
+            Clear
+        </button>
+
         <h3 id="result">Result: -</h3>
+
+        <div class="version">
+            CalculatorWeb - Version 2.0
+        </div>
     </div>
+
     <script>
         async function calculate() {
             const a = document.getElementById('num1').value;
             const b = document.getElementById('num2').value;
-            const response = await fetch(
-                '/api/add?a=' + encodeURIComponent(a) +
-                '&b=' + encodeURIComponent(b)
-            );
-            if (!response.ok) {
-                document.getElementById('result').innerText = 'Invalid numbers';
+
+            if (a === '' || b === '') {
+                document.getElementById('result').innerText =
+                    'Please enter both numbers';
                 return;
             }
-            const data = await response.json();
+
+            try {
+                const response = await fetch(
+                    '/api/add?a=' + encodeURIComponent(a) +
+                    '&b=' + encodeURIComponent(b)
+                );
+
+                if (!response.ok) {
+                    throw new Error('Invalid numbers');
+                }
+
+                const data = await response.json();
+
+                document.getElementById('result').innerText =
+                    'Result: ' + data.result;
+            }
+            catch (error) {
+                document.getElementById('result').innerText =
+                    'Calculation error';
+            }
+        }
+
+        function clearCalculator() {
+            document.getElementById('num1').value = '';
+            document.getElementById('num2').value = '';
             document.getElementById('result').innerText =
-                'Result: ' + data.result;
+                'Result: -';
+
+            document.getElementById('num1').focus();
         }
     </script>
 </body>
 </html>
 """, "text/html"));
 
+// Addition API
 app.MapGet("/api/add", (double a, double b) =>
-    Results.Ok(new { result = a + b }));
+{
+    return Results.Ok(new
+    {
+        result = a + b
+    });
+});
 
 app.Run();
