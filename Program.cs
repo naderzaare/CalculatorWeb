@@ -9,7 +9,7 @@ app.MapGet("/", () => Results.Content("""
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Docker Calculator v2</title>
+    <title>Docker Calculator v3</title>
 
     <style>
         body {
@@ -90,7 +90,7 @@ app.MapGet("/", () => Results.Content("""
         <h3 id="result">Result: -</h3>
 
         <div class="version">
-            CalculatorWeb - Version 2.0
+            CalculatorWeb - Version 3.0
         </div>
     </div>
 

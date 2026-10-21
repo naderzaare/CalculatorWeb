@@ -1,0 +1,6 @@
+@"
+**/bin/
+**/obj/
+.git/
+.vs/
+"@ | Set-Content -Encoding ascii .dockerignore
